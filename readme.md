@@ -1,4 +1,4 @@
-# EKIVAL-Canvas: Backend Transaction Building APIs for Handshake Server
+# EKIVAL-Canvas: Backend Transaction Building APIs for Ekival Server
 
 ## Introduction
 
