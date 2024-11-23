@@ -16,31 +16,34 @@ var (
 )
 
 type Config struct {
+	ContractsController SpendingContractConfig `json:"ContractsController"`
+	MainTreasury        SpendingContractConfig `json:"MainTreasury"`
+	OfferAdmin          string                 `json:"OfferAdmin"`
+	ADAMarketplace      ADAMarketplace         `json:"ada"`
+	TMoneyMarketplace   TokenMarketplace       `json:"tMoney"`
+}
+
+type ADAMarketplace struct {
 	AdaP2PBuyEscrow       SpendingContractConfig `json:"AdaP2PBuyEscrow"`
 	APBST                 MintingContractConfig  `json:"APBST"`
 	AdaP2PSellEscrow      SpendingContractConfig `json:"AdaP2PSellEscrow"`
 	APSST                 MintingContractConfig  `json:"APSST"`
-	EkiP2PBuyEscrow       SpendingContractConfig `json:"EkiP2PBuyEscrow"`
-	EKI_BST               MintingContractConfig  `json:"EKI_BST"`
-	EkiP2PSellEscrow      SpendingContractConfig `json:"EkiP2PSellEscrow"`
-	EKI_SST               MintingContractConfig  `json:"EKI_SST"`
-	Staking               SpendingContractConfig `json:"Staking"`
-	MainTreasury          SpendingContractConfig `json:"MainTreasury"`
+	AdminWalletsMnemonics AdminsMnemonics        `json:"AdminWalletsMnemonics"`
+}
+type TokenMarketplace struct {
+	TokenP2PBuyEscrow     SpendingContractConfig `json:"TokenP2PBuyEscrow"`
+	TPBST                 MintingContractConfig  `json:"TPBST"`
+	TokenP2PSellEscrow    SpendingContractConfig `json:"TokenP2PSellEscrow"`
+	TPSST                 MintingContractConfig  `json:"TPSST"`
 	AdminWalletsMnemonics AdminsMnemonics        `json:"AdminWalletsMnemonics"`
 }
 
 type AdminsMnemonics struct {
-	OfferAdmin      string `json:"OfferAdmin"`
-	AdaP2PBuyAdmin  string `json:"AdaP2PBuyAdmin"`
-	AdaP2PSellAdmin string `json:"AdaP2PSellAdmin"`
-	EkiP2PBuyAdmin  string `json:"EkiP2PBuyAdmin"`
-	EkiP2PSellAdmin string `json:"EkiP2PSellAdmin"`
-	APBSTAdmin      string `json:"APBSTAdmin"`
-	APSSTAdmin      string `json:"APSSTAdmin"`
-	EKI_BSTAdmin    string `json:"EKI_BSTAdmin"`
-	EKI_SSTAdmin    string `json:"EKI_SSTAdmin"`
+	BuyAdmin  string `json:"BuyAdmin"`
+	SellAdmin string `json:"SellAdmin"`
+	BSTAdmin  string `json:"BSTAdmin"`
+	SSTAdmin  string `json:"SSTAdmin"`
 }
-
 type SpendingContractConfig struct {
 	Address  string `json:"Address"`
 	RefTxID  string `json:"RefTxID"`

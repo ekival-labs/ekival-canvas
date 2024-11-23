@@ -1,4 +1,4 @@
-package viewmodel
+package model
 
 import (
 	"github.com/Salvionied/apollo/serialization/Address"
@@ -9,6 +9,11 @@ type OrderTxInfo struct {
 	EscrowContractRefUtxo EUTxO
 	StateTokenPolicyId    string
 	StateTokenRefUtxo     EUTxO
+	MakerFee              int64
+	TakerFee              int64
+	DisputeFee            int64
+	CancelFee             int64
+	CollateralAmount      int64
 	ChangeAddress         Address.Address
 	UserUtxos             []EUTxO
 	CollateralUtxo        EUTxO
@@ -17,14 +22,16 @@ type OrderTxInfo struct {
 
 type OrderInfo struct {
 	_                  struct{}        `plutusType:"DefList" plutusConstr:"1"`
-	TradeTokenName     string          `plutusType:"StringBytes" omitempty:"True"`
-	TradeTokenPolicyId string          `plutusType:"HexString" omitempty:"True"`
+	TradeTokenName     string          `plutusType:"StringBytes, omitempty"`
+	TradeTokenPolicyId string          `plutusType:"HexString, omitempty"`
 	OrderId            string          `plutusType:"StringBytes"`
 	OrderAmount        int64           `plutusType:"Int"`
 	MakerAddress       Address.Address `plutusType:"Address"`
+	MakerRepAddress    MaybeAddress
 	TakerAddress       Address.Address `plutusType:"Address"`
-	MakerDeadline      int64           `plutusType:"Int"`
-	TakerDeadline      int64           `plutusType:"Int"`
+	TakerRepAddress    MaybeAddress
+	MakerDeadline      int64 `plutusType:"Int"`
+	TakerDeadline      int64 `plutusType:"Int"`
 }
 
 type BrokerageInfo struct {
@@ -41,7 +48,7 @@ type BrokerageInfo struct {
 	MinOrderAmount int64    `plutusType:"Int"`
 	OrderThreshold int64    `plutusType:"Int"`
 	CancelPenalty  int64    `plutusType:"Int"`
-	AdaCollateral  int64    `plutusType:"Int" omitempty:"True"`
+	AdaCollateral  int64    `plutusType:"Int, omitempty"`
 }
 
 type Order struct {

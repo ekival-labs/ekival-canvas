@@ -1,4 +1,4 @@
-package viewmodel
+package model
 
 import (
 	"github.com/Salvionied/apollo/serialization/Address"

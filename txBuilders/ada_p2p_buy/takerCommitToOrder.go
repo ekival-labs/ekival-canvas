@@ -13,6 +13,7 @@ import (
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	fiberLogger "github.com/gofiber/fiber/v2/log"
 )
 
 // cfg := config.GetGlobalConfig()
@@ -41,13 +42,8 @@ import (
 // 		return err
 // 	}
 
-// 	currentTime := time.Now().UnixNano() / int64(time.Millisecond)
-// // MakerDeadline is whole Order Time in Hours for example 5 days = 5 * 24 * 60 * 60 * 1000
-// 	var md int64 = currentTime + (MakerDeadline * 1000)
-// // TakerDeadline less than MakerDeadline in Hours for example 4 day = 4 * 24 * 60 * 60 * 1000
-// 	var td int64 = currentTime + (TakerDeadline * 1000)
-
 // makerFee := utility.CalculateFee(database.Precision, database.OrderAmount, database.OrderThreshold, database.MakerPct, database.MakerMinFee)
+// takerFee := utility.CalculateFee(database.Precision, database.OrderAmount, database.OrderThreshold, database.TakerPct, database.TakerMinFee)
 // collateralAmount := utility.CalculateFee(database.Precision, database.OrderAmount, database.OrderThreshold, database.CollateralPct, database.MinCollateral)
 
 // orderInfo := &viewmodel.Order{
@@ -56,8 +52,8 @@ import (
 // 		OrderAmount:        body.OrderAmount,
 // 		MakerAddress:       ma,
 // 		TakerAddress:       ta,
-// 		MakerDeadline:      md,
-// 		TakerDeadline:      td,
+// 		MakerDeadline:      database.MakerDeadline,
+// 		TakerDeadline:      database.TakerDeadline,
 // 	},
 // 	BrokerageInfo: viewmodel.BrokerageInfo{
 // 		Precision:      database.Precision,
@@ -73,7 +69,7 @@ import (
 // 		OrderThreshold: database.OrderThreshold,
 // 		CancelPenalty:  database.CancelPenalty,
 // 	},
-// 	TradeState: constants.UNCOMMITTED_ORDER_STATUS,
+// 	TradeState: constants.COMMITTED_ORDER_STATUS,
 // 	OrderTxInfo: viewmodel.OrderTxInfo{
 // 		EscrowContractAddress: escrowContractAddress,
 // 		EscrowContractRefUtxo: model.EUTxO{
@@ -86,15 +82,20 @@ import (
 // 			TxIDIndex: database.Ada_BST.RefTxIDIndex,
 // 		},
 // 		MakerFee:         makerFee,
+// 		TakerFee:         takerFee,
 // 		CollateralAmount: collateralAmount,
 // 		ChangeAddress:    changeAddress,
 // 		UserUtxos:        body.UserUTxOs,
 // 		CollateralUtxo:   body.CollateralUTxO,
+// 		OrderUtxo : model.EUTxO{
+// 			TxID:      database.OrderUtxo.TxID,
+// 			TxIDIndex: database.OrderUtxo.TxIDIndex,
+// 		}
 // 	},
 // }
 
-// cborString, txHash, err := ada_p2p_buy.MakerCreateOrder(orderInfo, config.GetAda_BSTAdminWallet())
-func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (string, string, error) {
+// cborString, txHash, err := ada_p2p_buy.TakerCommitToOrder(orderInfo, config.GetAda_P2PBuyAdminWallet())
+func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (string, string, error) {
 
 	// defer func() {
 	// 	if err := recover(); err != nil {
@@ -104,9 +105,11 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 	// }()
 
 	apolloBE := apollo.New(&config.BFC)
-	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.MakerAddress.String())
+	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.TakerAddress.String())
 
-	makerCommittingAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.MakerFee + order.OrderTxInfo.CollateralAmount
+	makerCommittedAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.MakerFee + order.OrderTxInfo.CollateralAmount
+	takerCommittingAmount := order.OrderTxInfo.TakerFee + order.OrderTxInfo.CollateralAmount
+	totalAmount := makerCommittedAmount + takerCommittingAmount
 
 	orderDatumMarshaled, err := plutusEncoder.MarshalPlutus(*order)
 	if err != nil {
@@ -114,6 +117,8 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		return "", "", err
 	}
 
+	collateralUtxo := config.BFC.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	orderUTxO := config.BFC.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
 	userUtxos, err := utility.GetUserUTxOs(order.OrderTxInfo.UserUtxos)
 	if err != nil {
 		log.Println(err)
@@ -122,37 +127,24 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 
 	lastSlot := config.BFC.LastBlockSlot()
 
-	collateralUtxo := config.BFC.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
-
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
 		AddCollateral(*collateralUtxo).
 		AddLoadedUTxOs(userUtxos...).
-		MintAssetsWithRedeemer(
-			apollo.Unit{
-				PolicyId: order.OrderTxInfo.StateTokenPolicyId,
-				Name:     order.OrderInfo.OrderId,
-				Quantity: int(1),
-			},
-			*constants.INDEX_ONE_MINT_REDEEMER,
-		).
+		CollectFrom(*orderUTxO, *constants.INDEX_TWO_SPEND_REDEEMER).
 		AddReferenceInput(
-			order.OrderTxInfo.StateTokenRefUtxo.TxID,
-			order.OrderTxInfo.StateTokenRefUtxo.TxIDIndex,
+			order.OrderTxInfo.EscrowContractRefUtxo.TxID,
+			order.OrderTxInfo.EscrowContractRefUtxo.TxIDIndex,
 		).
 		PayToContract(
-			order.OrderTxInfo.EscrowContractAddress,
-			orderDatumMarshaled,
-			int(makerCommittingAmount),
-			true,
-			apollo.Unit{
+			order.OrderTxInfo.EscrowContractAddress, orderDatumMarshaled, int(totalAmount), true, apollo.Unit{
 				PolicyId: order.OrderTxInfo.StateTokenPolicyId,
 				Name:     order.OrderInfo.OrderId,
 				Quantity: int(1),
 			},
 		).
 		AddRequiredSigner(adminWallet.AdminPKH).
-		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
+		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.TakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
 
@@ -180,8 +172,9 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		return "", "", err
 	}
 
-	fmt.Println("TX EVAL: ", config.BFC.EvaluateTx(txByte))
-	fmt.Println("CBOR: ", Utils.ToCbor(tx))
+	fiberLogger.Debug("TxID:", hex.EncodeToString(txHash))
+	fiberLogger.Debug("Tx CBOR:", Utils.ToCbor(tx))
+	fiberLogger.Debug("EvaluateTx:", config.BFC.EvaluateTx(txByte))
 
 	if len(config.BFC.EvaluateTx(txByte)) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")

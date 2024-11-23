@@ -18,30 +18,30 @@ type AdminWallet struct {
 }
 
 var (
-	offerAdminWallet      = &AdminWallet{}
-	adaP2PBuyAdminWallet  = &AdminWallet{}
-	adaP2PSellAdminWallet = &AdminWallet{}
-	EkiP2PBuyAdminWallet  = &AdminWallet{}
-	EkiP2PSellAdminWallet = &AdminWallet{}
-	aPBSTAdminWallet      = &AdminWallet{}
-	aPSSTAdminWallet      = &AdminWallet{}
-	EKI_BSTAdminWallet    = &AdminWallet{}
-	EKI_SSTAdminWallet    = &AdminWallet{}
+	offerAdminWallet         = &AdminWallet{}
+	adaP2PBuyAdminWallet     = &AdminWallet{}
+	adaP2PSellAdminWallet    = &AdminWallet{}
+	tMoneyP2PBuyAdminWallet  = &AdminWallet{}
+	tMoneyP2PSellAdminWallet = &AdminWallet{}
+	aPBSTAdminWallet         = &AdminWallet{}
+	aPSSTAdminWallet         = &AdminWallet{}
+	tMoneyBSTAdminWallet     = &AdminWallet{}
+	tMoneySSTAdminWallet     = &AdminWallet{}
 )
 
 func WalletSetup() {
 
 	cfg := GetGlobalConfig()
 
-	offerAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.OfferAdmin))
-	adaP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.AdaP2PBuyAdmin))
-	adaP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.AdaP2PSellAdmin))
-	EkiP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.EkiP2PBuyAdmin))
-	EkiP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.EkiP2PSellAdmin))
-	aPBSTAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.APBSTAdmin))
-	aPSSTAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.APSSTAdmin))
-	EKI_BSTAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.EKI_BSTAdmin))
-	EKI_SSTAdminWallet = SetAdminWallet(toMnemonic(cfg.AdminWalletsMnemonics.EKI_SSTAdmin))
+	offerAdminWallet = SetAdminWallet(toMnemonic(cfg.OfferAdmin))
+	adaP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BuyAdmin))
+	adaP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SellAdmin))
+	aPBSTAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BSTAdmin))
+	aPSSTAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SSTAdmin))
+	tMoneyP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BuyAdmin))
+	tMoneyP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SellAdmin))
+	tMoneyBSTAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BSTAdmin))
+	tMoneySSTAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SSTAdmin))
 }
 
 func SetAdminWallet(mnemonic string) *AdminWallet {
@@ -93,12 +93,12 @@ func GetAdaP2PSellAdminWallet() *AdminWallet {
 	return adaP2PSellAdminWallet
 }
 
-func GetEkiP2PBuyAdminWallet() *AdminWallet {
-	return EkiP2PBuyAdminWallet
+func GetTMoneyP2PBuyAdminWallet() *AdminWallet {
+	return tMoneyP2PBuyAdminWallet
 }
 
-func GetEkiP2PSellAdminWallet() *AdminWallet {
-	return EkiP2PSellAdminWallet
+func GetTMoneyP2PSellAdminWallet() *AdminWallet {
+	return tMoneyP2PSellAdminWallet
 }
 
 func GetAPBSTAdminWallet() *AdminWallet {
@@ -109,10 +109,10 @@ func GetAPSSTAdminWallet() *AdminWallet {
 	return aPSSTAdminWallet
 }
 
-func GetEKI_BSTAdminWallet() *AdminWallet {
-	return EKI_BSTAdminWallet
+func GetTMoneyBSTAdminWallet() *AdminWallet {
+	return tMoneyBSTAdminWallet
 }
 
-func GetEKI_SSTAdminWallet() *AdminWallet {
-	return EKI_SSTAdminWallet
+func GetTMoneySSTAdminWallet() *AdminWallet {
+	return tMoneySSTAdminWallet
 }

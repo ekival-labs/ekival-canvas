@@ -3,9 +3,9 @@ package token_p2p_buy
 import (
 	"ekival-canvas/config"
 	"ekival-canvas/constants"
+	"ekival-canvas/model"
 	"ekival-canvas/plutusEncoder"
 	"ekival-canvas/utility"
-	"ekival-canvas/viewmodel"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -15,7 +15,7 @@ import (
 	"github.com/Salvionied/apollo/txBuilding/Utils"
 )
 
-func MakerCreateOrder(order *viewmodel.Order, adminWallet *config.AdminWallet) (string, string, error) {
+func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (string, string, error) {
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -27,10 +27,7 @@ func MakerCreateOrder(order *viewmodel.Order, adminWallet *config.AdminWallet) (
 	apolloBE := apollo.New(&config.BFC)
 	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.MakerAddress.String())
 
-	makerFee := utility.CalculateFee(order.BrokerageInfo.Precision, order.OrderInfo.OrderAmount, order.BrokerageInfo.OrderThreshold, order.BrokerageInfo.MakerPct, order.BrokerageInfo.MakerMinFee)
-	collateralAmount := utility.CalculateFee(order.BrokerageInfo.Precision, order.OrderInfo.OrderAmount, order.BrokerageInfo.OrderThreshold, order.BrokerageInfo.CollateralPct, order.BrokerageInfo.MinCollateral)
-
-	makerCommittingAmount := order.OrderInfo.OrderAmount + makerFee + collateralAmount
+	makerCommittingAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.MakerFee + order.OrderTxInfo.CollateralAmount
 
 	orderDatumMarshaled, err := plutusEncoder.MarshalPlutus(*order)
 	if err != nil {
@@ -58,7 +55,7 @@ func MakerCreateOrder(order *viewmodel.Order, adminWallet *config.AdminWallet) (
 				Name:     order.OrderInfo.OrderId,
 				Quantity: int(1),
 			},
-			constants.INDEX_ONE_MINT_REDEEMER,
+			*constants.INDEX_ONE_MINT_REDEEMER,
 		).
 		AddReferenceInput(
 			order.OrderTxInfo.StateTokenRefUtxo.TxID,
@@ -111,7 +108,7 @@ func MakerCreateOrder(order *viewmodel.Order, adminWallet *config.AdminWallet) (
 
 	// fmt.Println("TX EVAL: ", config.BFC.EvaluateTx(txByte))
 	// fmt.Println("CBOR: ", Utils.ToCbor(tx))
-	
+
 	if len(config.BFC.EvaluateTx(txByte)) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")
 	}

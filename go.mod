@@ -2,10 +2,11 @@ module ekival-canvas
 
 go 1.21.4
 
-// replace github.com/Salvionied/apollo v1.0.9 => github.com/Andamio-Platform/apollo v0.0.0-20231228181904-4d2c091b2cfc
+// replace github.com/Salvionied/apollo v1.0.11 => github.com/Andamio-Platform/apollo v0.0.0-20240124192523-c5190f2903b5
 
 require (
-	github.com/Salvionied/apollo v1.0.7
+	// github.com/Salvionied/apollo v1.0.12-0.20240306212134-9e98c9cd1218
+	github.com/Salvionied/apollo v1.0.12-0.20240603170124-4c7b5b1c9f13
 	github.com/SundaeSwap-finance/kugo v0.1.5
 	github.com/SundaeSwap-finance/ogmigo/v6 v6.0.0-20231101192200-2e052daaeb54
 	github.com/blinklabs-io/bursa v0.6.0
@@ -26,6 +27,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
+	github.com/maestro-org/go-sdk v1.1.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect

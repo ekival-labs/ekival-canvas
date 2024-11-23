@@ -1,4 +1,4 @@
-package handlers
+package token_buy_handlers
 
 import (
 	"encoding/json"
@@ -9,8 +9,9 @@ import (
 	"ekival-canvas/config"
 	"ekival-canvas/constants"
 	"ekival-canvas/errors"
+	"ekival-canvas/model"
 	"ekival-canvas/txBuilders/token_p2p_buy"
-	"ekival-canvas/vars"
+	"ekival-canvas/utility"
 	"ekival-canvas/viewmodel"
 
 	"github.com/Salvionied/apollo/serialization/Address"
@@ -59,13 +60,13 @@ func MakerCreateEkiBuyOrderHandler(c *fiber.Ctx) error {
 
 	cfg := config.GetGlobalConfig()
 
-	ma, err := Address.DecodeAddress(vars.MakerAddress)
+	ma, err := Address.DecodeAddress(u.MakerAddress)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	ta, err := Address.DecodeAddress(vars.TakerAddress)
+	ta, err := Address.DecodeAddress(u.TakerAddress)
 	if err != nil {
 		log.Println(err)
 		return err
@@ -77,67 +78,68 @@ func MakerCreateEkiBuyOrderHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	escrowContractAddress, err := Address.DecodeAddress(cfg.EkiP2PBuyEscrow.Address)
+	escrowContractAddress, err := Address.DecodeAddress(cfg.TMoneyMarketplace.TokenP2PBuyEscrow.Address)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
 	currentTime := time.Now().UnixNano() / int64(time.Millisecond)
-	var md int64 = currentTime + (vars.MakerDeadline * 1000)
-	var td int64 = currentTime + (vars.TakerDeadline * 1000)
+	var md int64 = currentTime + (u.MakerDeadline * 1000)
+	var td int64 = currentTime + (u.TakerDeadline * 1000)
 
-	// var order *viewmodel.Order = &viewmodel.Order{}
-	orderInfo := &viewmodel.Order{
-		OrderInfo: viewmodel.OrderInfo{
-			TradeTokenName:     vars.TEKITokenName,
-			TradeTokenPolicyId: vars.TEKIPolicyId,
-			OrderId:            vars.OrderId,
-			OrderAmount:        vars.OrderAmount,
+	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
+	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+
+	orderInfo := &model.Order{
+		OrderInfo: model.OrderInfo{
+			TradeTokenName:     u.TradeTokenName,
+			TradeTokenPolicyId: u.TradeTokenPolicyId,
+			OrderId:            u.OrderId,
+			OrderAmount:        u.OrderAmount,
 			MakerAddress:       ma,
 			TakerAddress:       ta,
 			MakerDeadline:      md,
 			TakerDeadline:      td,
 		},
-		BrokerageInfo: viewmodel.BrokerageInfo{
-			Precision:      vars.Precision,
-			CollateralPct:  vars.CollateralPct,
-			MakerPct:       vars.MakerPct,
-			TakerPct:       vars.TakerPct,
-			CancelPct:      vars.CancelPct,
-			MinCollateral:  vars.MinCollateral,
-			MakerMinFee:    vars.MakerMinFee,
-			TakerMinFee:    vars.TakerMinFee,
-			CancelMinFee:   vars.CancelMinFee,
-			MinOrderAmount: vars.MinOrderAmount,
-			OrderThreshold: vars.OrderThreshold,
-			CancelPenalty:  vars.CancelPenalty,
-			AdaCollateral:  vars.AdaCollateral,
+		BrokerageInfo: model.BrokerageInfo{
+			Precision:      u.Precision,
+			CollateralPct:  u.CollateralPct,
+			MakerPct:       u.MakerPct,
+			TakerPct:       u.TakerPct,
+			CancelPct:      u.CancelPct,
+			MinCollateral:  u.MinCollateral,
+			MakerMinFee:    u.MakerMinFee,
+			TakerMinFee:    u.TakerMinFee,
+			CancelMinFee:   u.CancelMinFee,
+			MinOrderAmount: u.MinOrderAmount,
+			OrderThreshold: u.OrderThreshold,
+			CancelPenalty:  u.CancelPenalty,
+			AdaCollateral:  u.AdaCollateral,
 		},
 		TradeState: constants.UNCOMMITTED_ORDER_STATUS,
 
-		OrderTxInfo: viewmodel.OrderTxInfo{
+		OrderTxInfo: model.OrderTxInfo{
 			EscrowContractAddress: escrowContractAddress,
-			EscrowContractRefUtxo: viewmodel.EUTxO{
-				TxID:      cfg.EkiP2PBuyEscrow.RefTxID,
-				TxIDIndex: cfg.EkiP2PBuyEscrow.RefTxIDx,
+			EscrowContractRefUtxo: model.EUTxO{
+				TxID:      cfg.TMoneyMarketplace.TokenP2PBuyEscrow.RefTxID,
+				TxIDIndex: cfg.TMoneyMarketplace.TokenP2PBuyEscrow.RefTxIDx,
 			},
-			StateTokenPolicyId: cfg.EKI_BST.PolicyID,
-			StateTokenRefUtxo: viewmodel.EUTxO{
-				TxID:      cfg.EKI_BST.RefTxID,
-				TxIDIndex: cfg.EKI_BST.RefTxIDx,
+			StateTokenPolicyId: cfg.TMoneyMarketplace.TPBST.PolicyID,
+			StateTokenRefUtxo: model.EUTxO{
+				TxID:      cfg.TMoneyMarketplace.TPBST.RefTxID,
+				TxIDIndex: cfg.TMoneyMarketplace.TPBST.RefTxIDx,
 			},
-			ChangeAddress:  changeAddress,
-			UserUtxos:      u.UserUTxOs,
-			CollateralUtxo: u.CollateralUTxO,
+			MakerFee:         makerFee,
+			CollateralAmount: collateralAmount,
+			ChangeAddress:    changeAddress,
+			UserUtxos:        u.UserUTxOs,
+			CollateralUtxo:   u.CollateralUTxO,
 		},
 	}
 
-	cborString, txHash, err := token_p2p_buy.MakerCreateOrder(orderInfo, config.GetEKI_BSTAdminWallet())
+	cborString, txHash, err := token_p2p_buy.MakerCreateOrder(orderInfo, config.GetTMoneyBSTAdminWallet())
 	if cborString == "" || txHash == "" || err != nil {
-		return errors.TxError(c)
-	}
-	if err != nil {
 		return errors.TxError(c)
 	}
 

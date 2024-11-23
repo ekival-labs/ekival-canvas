@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	INDEX_ONE_MINT_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_ONE_MINT_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.MINT,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -16,7 +16,7 @@ var (
 		},
 	}
 
-	INDEX_TWO_MINT_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_TWO_MINT_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.MINT,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -26,7 +26,7 @@ var (
 		},
 	}
 
-	INDEX_ONE_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_ONE_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -36,7 +36,7 @@ var (
 		},
 	}
 
-	INDEX_TWO_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_TWO_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -46,7 +46,7 @@ var (
 		},
 	}
 
-	INDEX_THREE_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_THREE_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -56,7 +56,7 @@ var (
 		},
 	}
 
-	INDEX_FOUR_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_FOUR_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -66,7 +66,7 @@ var (
 		},
 	}
 
-	INDEX_FIVE_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_FIVE_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -76,7 +76,7 @@ var (
 		},
 	}
 
-	INDEX_SIX_SPEND_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	INDEX_SIX_SPEND_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{
@@ -86,7 +86,7 @@ var (
 		},
 	}
 
-	EXTEND_DEADLINES_WITH_NO_PENALTY_REDEEMER Redeemer.Redeemer = Redeemer.Redeemer{
+	EXTEND_DEADLINES_WITH_NO_PENALTY_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{
 		Tag:   Redeemer.SPEND,
 		Index: 0,
 		Data: PlutusData.PlutusData{

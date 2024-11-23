@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/Salvionied/apollo/serialization/Address"
 	"github.com/Salvionied/apollo/serialization/PlutusData"
@@ -118,14 +119,22 @@ func MarshalPlutus(v interface{}) (*PlutusData.PlutusData, error) {
 			constr := uint64(0)
 			typeOfField := tag.Get("plutusType")
 			constrOfField := tag.Get("plutusConstr")
-			omitemptyField := tag.Get("omitempty")
 
 			if typeOfField == "Ignore" {
 				continue
 			}
 
-			if omitemptyField == "True" && reflect.DeepEqual(values.Field(i).Interface(), reflect.Zero(f.Type).Interface()) {
-				continue
+			if len(typeOfField) > 1 {
+				omitempty := false
+				for _, part := range strings.Split(typeOfField, ",") {
+					switch strings.ToLower(strings.TrimSpace(part)) {
+					case "omitempty":
+						omitempty = true
+					}
+				}
+				if omitempty {
+					continue
+				}
 			}
 
 			if constrOfField != "" {

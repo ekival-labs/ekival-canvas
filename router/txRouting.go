@@ -2,7 +2,9 @@ package router
 
 import (
 	"ekival-canvas/config"
-	"ekival-canvas/handlers"
+	"ekival-canvas/handlers/ada_buy_handlers"
+	"ekival-canvas/handlers/offers_handlers"
+	"ekival-canvas/handlers/token_buy_handlers"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,7 +26,7 @@ func RouterInit() {
 		CaseSensitive: true,
 		StrictRouting: true,
 		ServerHeader:  "EKIVAL-Canvas",
-		AppName:       "Ekival Server 1.0.0",
+		AppName:       "Ekival Canvas 1.0.0",
 	})
 
 	// middlewares
@@ -53,8 +55,16 @@ func RouterInit() {
 	version := api.Group("/v1")
 
 	tx := version.Group("/tx")
-	tx.Post("/makerCreateAdaBuyOrder", handlers.MakerCreateAdaBuyOrderHandler)
-	tx.Post("/makerCreateEkiBuyOrder", handlers.MakerCreateEkiBuyOrderHandler)
+
+	adaBuy := tx.Group("/ada-buy")
+	adaBuy.Post("/maker-create-order", ada_buy_handlers.MakerCreateAdaBuyOrderHandler)
+	adaBuy.Post("/taker-commit-to-order", ada_buy_handlers.TakerCommitToAdaBuyOrderHandler)
+
+	tokenBuy := tx.Group("/token-buy")
+	tokenBuy.Post("/maker-create-order", token_buy_handlers.MakerCreateEkiBuyOrderHandler)
+
+	offer := tx.Group("/offer")
+	offer.Post("/create-offer", offers_handlers.MakerCreateOfferHandler)
 
 	// Running server
 	log.Fatal(router.Listen(config.HOST))
