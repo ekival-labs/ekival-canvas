@@ -21,7 +21,7 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 		}
 	}()
 
-	apolloBE := apollo.New(&config.BFC)
+	apolloBE := apollo.New(&config.CHAIN_CTX)
 	// apolloBE = apolloBE.SetWalletFromAddress(offer.MakerAddress)
 	apolloBE = apolloBE.SetWalletFromBech32(offer.MakerAddress.String())
 
@@ -31,9 +31,9 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 		return "", "", err
 	}
 
-	collateralUtxo := config.BFC.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
+	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
 
-	lastSlot := config.BFC.LastBlockSlot()
+	lastSlot := config.CHAIN_CTX.LastBlockSlot()
 
 	apolloBE, err = apolloBE.
 		AddLoadedUTxOs(userUtxos...).

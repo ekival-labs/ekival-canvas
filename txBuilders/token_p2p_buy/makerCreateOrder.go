@@ -24,7 +24,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		}
 	}()
 
-	apolloBE := apollo.New(&config.BFC)
+	apolloBE := apollo.New(&config.CHAIN_CTX)
 	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.MakerAddress.String())
 
 	makerCommittingAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.MakerFee + order.OrderTxInfo.CollateralAmount
@@ -41,9 +41,9 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		return "", "", err
 	}
 
-	lastSlot := config.BFC.LastBlockSlot()
+	lastSlot := config.CHAIN_CTX.LastBlockSlot()
 
-	collateralUtxo := config.BFC.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
 
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
@@ -106,10 +106,10 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		return "", "", err
 	}
 
-	// fmt.Println("TX EVAL: ", config.BFC.EvaluateTx(txByte))
+	// fmt.Println("TX EVAL: ", config.CHAIN_CTX.EvaluateTx(txByte))
 	// fmt.Println("CBOR: ", Utils.ToCbor(tx))
 
-	if len(config.BFC.EvaluateTx(txByte)) == 0 {
+	if len(config.CHAIN_CTX.EvaluateTx(txByte)) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")
 	}
 

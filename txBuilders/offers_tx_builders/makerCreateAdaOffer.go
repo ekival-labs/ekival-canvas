@@ -21,7 +21,7 @@ func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryIn
 		}
 	}()
 
-	apolloBE := apollo.New(&config.BFC)
+	apolloBE := apollo.New(&config.CHAIN_CTX)
 	// apolloBE = apolloBE.SetWalletFromAddress(offer.MakerAddress)
 	apolloBE = apolloBE.SetWalletFromBech32(offer.MakerAddress.String())
 
@@ -30,9 +30,9 @@ func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryIn
 		log.Println(err)
 		return "", "", err
 	}
-	collateralUtxo := config.BFC.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
+	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
 
-	lastSlot := config.BFC.LastBlockSlot()
+	lastSlot := config.CHAIN_CTX.LastBlockSlot()
 
 	apolloBE, err = apolloBE.
 		AddLoadedUTxOs(userUtxos...).

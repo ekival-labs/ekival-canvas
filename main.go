@@ -1,19 +1,49 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"log"
+	"net"
+	"net/http"
 	"os"
 
 	"ekival-canvas/config"
 	"ekival-canvas/router"
+
+	"golang.org/x/net/proxy"
 )
 
 var cmdlineFlags struct {
 	configFile string
 }
 
+var httpClient *http.Client // Global HTTP client with proxy setup
+
+func init() {
+	// Configure the SOCKS5 proxy
+	proxyAddr := "127.0.0.1:10808"
+	proxyDialer, err := proxy.SOCKS5("tcp", proxyAddr, nil, proxy.Direct)
+	if err != nil {
+		log.Fatalf("Failed to create SOCKS5 dialer: %v", err)
+	}
+
+	// Set up the HTTP transport with the proxy
+	transport := &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return proxyDialer.Dial(network, addr)
+		},
+	}
+
+	// Set the default HTTP transport globally
+	http.DefaultTransport = transport
+
+	log.Println("Proxy initialized globally.")
+}
+
 func main() {
+
 	// Load config
 	flag.StringVar(
 		&cmdlineFlags.configFile,
@@ -29,8 +59,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = config.ChainCTXSetup()
+	if err != nil {
+		fmt.Printf("Failed to set up chain context: %s\n", err)
+		os.Exit(1)
+	}
+
+	// Set up other configurations
 	config.WalletSetup()
 
+	// Initialize router
 	router.RouterInit()
-
 }

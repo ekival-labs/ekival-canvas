@@ -104,7 +104,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 	// 	}
 	// }()
 
-	apolloBE := apollo.New(&config.BFC)
+	apolloBE := apollo.New(&config.CHAIN_CTX)
 	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.TakerAddress.String())
 
 	makerCommittedAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.MakerFee + order.OrderTxInfo.CollateralAmount
@@ -117,15 +117,15 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 		return "", "", err
 	}
 
-	collateralUtxo := config.BFC.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
-	orderUTxO := config.BFC.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
+	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	orderUTxO := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
 	userUtxos, err := utility.GetUserUTxOs(order.OrderTxInfo.UserUtxos)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
 	}
 
-	lastSlot := config.BFC.LastBlockSlot()
+	lastSlot := config.CHAIN_CTX.LastBlockSlot()
 
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
@@ -174,9 +174,9 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 
 	fiberLogger.Debug("TxID:", hex.EncodeToString(txHash))
 	fiberLogger.Debug("Tx CBOR:", Utils.ToCbor(tx))
-	fiberLogger.Debug("EvaluateTx:", config.BFC.EvaluateTx(txByte))
+	fiberLogger.Debug("EvaluateTx:", config.CHAIN_CTX.EvaluateTx(txByte))
 
-	if len(config.BFC.EvaluateTx(txByte)) == 0 {
+	if len(config.CHAIN_CTX.EvaluateTx(txByte)) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")
 	}
 

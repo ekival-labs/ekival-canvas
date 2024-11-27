@@ -79,22 +79,22 @@ func MakerConfirmReceipt(order *model.Order, treasury *model.TreasuryInfo, admin
 	// 	}
 	// }()
 
-	apolloBE := apollo.New(&config.BFC)
+	apolloBE := apollo.New(&config.CHAIN_CTX)
 	apolloBE = apolloBE.SetWalletFromBech32(order.OrderInfo.MakerAddress.String())
 
 	payToMakerAmount := order.OrderTxInfo.CollateralAmount
 	payToTakerAmount := order.OrderInfo.OrderAmount + order.OrderTxInfo.CollateralAmount
 	ekivalFee := order.OrderTxInfo.MakerFee + order.OrderTxInfo.TakerFee
 
-	collateralUtxo := config.BFC.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
-	orderUTxO := config.BFC.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
+	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	orderUTxO := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
 	userUtxos, err := utility.GetUserUTxOs(order.OrderTxInfo.UserUtxos)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
 	}
 
-	lastSlot := config.BFC.LastBlockSlot()
+	lastSlot := config.CHAIN_CTX.LastBlockSlot()
 
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
@@ -151,7 +151,7 @@ func MakerConfirmReceipt(order *model.Order, treasury *model.TreasuryInfo, admin
 		return "", "", err
 	}
 
-	if len(config.BFC.EvaluateTx(txByte)) == 0 {
+	if len(config.CHAIN_CTX.EvaluateTx(txByte)) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")
 	}
 

@@ -6,12 +6,15 @@ go 1.21.4
 
 require (
 	// github.com/Salvionied/apollo v1.0.12-0.20240306212134-9e98c9cd1218
-	github.com/Salvionied/apollo v1.0.12-0.20240603170124-4c7b5b1c9f13
+	// github.com/Salvionied/apollo v1.0.12-0.20240603170124-4c7b5b1c9f13
+	github.com/Salvionied/apollo v1.0.13-0.20241017181455-f2da1ed95d30
 	github.com/SundaeSwap-finance/kugo v0.1.5
-	github.com/SundaeSwap-finance/ogmigo/v6 v6.0.0-20231101192200-2e052daaeb54
+	github.com/SundaeSwap-finance/ogmigo/v6 v6.0.0-20240117201106-ce491d0b031e
 	github.com/blinklabs-io/bursa v0.6.0
 	github.com/gofiber/fiber/v2 v2.51.0
 )
+
+require golang.org/x/net v0.17.0
 
 require (
 	github.com/Salvionied/cbor/v2 v2.6.0 // indirect
@@ -27,7 +30,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
-	github.com/maestro-org/go-sdk v1.1.3 // indirect
+	github.com/maestro-org/go-sdk v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
