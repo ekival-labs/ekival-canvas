@@ -23,7 +23,7 @@ var httpClient *http.Client // Global HTTP client with proxy setup
 
 func init() {
 	// Configure the SOCKS5 proxy
-	proxyAddr := "127.0.0.1:10808"
+	proxyAddr := "127.0.0.1:2080"
 	proxyDialer, err := proxy.SOCKS5("tcp", proxyAddr, nil, proxy.Direct)
 	if err != nil {
 		log.Fatalf("Failed to create SOCKS5 dialer: %v", err)

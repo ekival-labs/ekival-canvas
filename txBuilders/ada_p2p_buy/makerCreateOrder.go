@@ -8,36 +8,36 @@ import (
 	"ekival-canvas/utility"
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	fiberLogger "github.com/gofiber/fiber/v2/log"
 )
 
 // cfg := config.GetGlobalConfig()
 
 // 	ma, err := Address.DecodeAddress(database.MakerAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	ta, err := Address.DecodeAddress(database.TakerAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	changeAddress, err := Address.DecodeAddress(body.ChangeAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	escrowContractAddress, err := Address.DecodeAddress(database.Ada_P2PBuyEscrow.Address)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
@@ -98,7 +98,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 
 	// defer func() {
 	// 	if err := recover(); err != nil {
-	// 		log.Printf("Panic occurred: %v", err)
+	// 	fiberLogger.Panic("Panic occurred: %v", err)
 	// 		return
 	// 	}
 	// }()
@@ -110,19 +110,27 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 
 	orderDatumMarshaled, err := plutusEncoder.MarshalPlutus(*order)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	userUtxos, err := utility.GetUserUTxOs(order.OrderTxInfo.UserUtxos)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	lastSlot := config.CHAIN_CTX.LastBlockSlot()
+	lastSlot, err := config.CHAIN_CTX.LastBlockSlot()
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
-	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	collateralUtxo, err := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
@@ -157,36 +165,49 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.AdminWallet) (stri
 		Complete()
 
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	tx := apolloBE.GetTx()
 	txHash, err := tx.TransactionBody.Hash()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	txByte, err := tx.Bytes()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	fmt.Println("TX EVAL: ", config.CHAIN_CTX.EvaluateTx(txByte))
-	fmt.Println("CBOR: ", Utils.ToCbor(tx))
+	evalTx, err := config.CHAIN_CTX.EvaluateTx(txByte)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
-	// if len(config.CHAIN_CTX.EvaluateTx(txByte)) == 0 {
-	// 	return "", "", fmt.Errorf("transaction evaluation failed")
-	// }
+	cbor, err := Utils.ToCbor(tx)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
-	return Utils.ToCbor(tx), hex.EncodeToString(txHash), nil
+	fiberLogger.Debug("TxID:", hex.EncodeToString(txHash))
+	fiberLogger.Debug("Tx CBOR:", cbor)
+	fiberLogger.Debug("EvaluateTx:", evalTx)
+
+	if len(evalTx) == 0 {
+		return "", "", fmt.Errorf("transaction evaluation failed")
+	}
+
+	return cbor, hex.EncodeToString(txHash), nil
 
 }

@@ -8,15 +8,14 @@ import (
 
 var (
 	// OGMIOS    OgmiosChainContext.OgmiosChainContext
-	// BFC       BlockFrostChainContext.BlockFrostChainContext
-	MC        MaestroChainContext.MaestroChainContext
+	// CHAIN_CTX BlockFrostChainContext.BlockFrostChainContext
 	CHAIN_CTX MaestroChainContext.MaestroChainContext
 )
 
 func ChainCTXSetup() error {
 	// OGMIOS = OgmiosChainContext.NewOgmiosChainContext(*ogmigo.New(ogmigo.WithEndpoint(constants.OGMIGO_ENDPOINT)), *kugo.New(kugo.WithEndpoint(constants.KUGO_ENDPOINT)))
 
-	// BFC = BlockFrostChainContext.NewBlockfrostChainContext(
+	// BFC, err := BlockFrostChainContext.NewBlockfrostChainContext(
 	// 	constants.BFC_API_URL,
 	// 	constants.BFC_NETWORK_ID,
 	// 	constants.BFC_API_KEY,
@@ -31,6 +30,7 @@ func ChainCTXSetup() error {
 		return err
 	} else {
 		CHAIN_CTX = MC
+		// CHAIN_CTX = BFC
 	}
 	return nil
 }

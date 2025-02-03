@@ -8,7 +8,6 @@ import (
 	"ekival-canvas/utility"
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
@@ -20,25 +19,25 @@ import (
 
 // 	ma, err := Address.DecodeAddress(database.MakerAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	ta, err := Address.DecodeAddress(database.TakerAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	changeAddress, err := Address.DecodeAddress(body.ChangeAddress)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
 // 	escrowContractAddress, err := Address.DecodeAddress(database.Ada_P2PBuyEscrow.Address)
 // 	if err != nil {
-// 		log.Println(err)
+// 		fiberLogger.Error(err)
 // 		return err
 // 	}
 
@@ -99,7 +98,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 
 	// defer func() {
 	// 	if err := recover(); err != nil {
-	// 		log.Printf("Panic occurred: %v", err)
+	// 		fiberLogger.Panic("Panic occurred: %v", err)
 	// 		return
 	// 	}
 	// }()
@@ -113,19 +112,33 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 
 	orderDatumMarshaled, err := plutusEncoder.MarshalPlutus(*order)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
-	orderUTxO := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
+	collateralUtxo, err := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.CollateralUtxo.TxID, order.OrderTxInfo.CollateralUtxo.TxIDIndex)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	orderUTxO, err := config.CHAIN_CTX.GetUtxoFromRef(order.OrderTxInfo.OrderUtxo.TxID, order.OrderTxInfo.OrderUtxo.TxIDIndex)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
 	userUtxos, err := utility.GetUserUTxOs(order.OrderTxInfo.UserUtxos)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	lastSlot := config.CHAIN_CTX.LastBlockSlot()
+	lastSlot, err := config.CHAIN_CTX.LastBlockSlot()
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
 	apolloBE, err = apolloBE.
 		SetChangeAddress(order.OrderTxInfo.ChangeAddress).
@@ -149,37 +162,49 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (st
 		Complete()
 
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	tx := apolloBE.GetTx()
 	txHash, err := tx.TransactionBody.Hash()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	txByte, err := tx.Bytes()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	evalTx, err := config.CHAIN_CTX.EvaluateTx(txByte)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	cbor, err := Utils.ToCbor(tx)
+	if err != nil {
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	fiberLogger.Debug("TxID:", hex.EncodeToString(txHash))
-	fiberLogger.Debug("Tx CBOR:", Utils.ToCbor(tx))
-	fiberLogger.Debug("EvaluateTx:", config.CHAIN_CTX.EvaluateTx(txByte))
+	fiberLogger.Debug("Tx CBOR:", cbor)
+	fiberLogger.Debug("EvaluateTx:", evalTx)
 
-	if len(config.CHAIN_CTX.EvaluateTx(txByte)) == 0 {
+	if len(evalTx) == 0 {
 		return "", "", fmt.Errorf("transaction evaluation failed")
 	}
 
-	return Utils.ToCbor(tx), hex.EncodeToString(txHash), nil
+	return cbor, hex.EncodeToString(txHash), nil
 
 }

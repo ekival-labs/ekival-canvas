@@ -5,18 +5,18 @@ import (
 	"ekival-canvas/model"
 	"ekival-canvas/utility"
 	"encoding/hex"
-	"log"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	fiberLogger "github.com/gofiber/fiber/v2/log"
 )
 
 func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryInfo, adminWallet *config.AdminWallet) (string, string, error) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			log.Printf("Panic occurred: %v", err)
+			fiberLogger.Panic("Panic occurred: %v", err)
 			return
 		}
 	}()
@@ -27,12 +27,21 @@ func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryIn
 
 	userUtxos, err := utility.GetUserUTxOs(offer.UserUtxos)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
-	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
 
-	lastSlot := config.CHAIN_CTX.LastBlockSlot()
+	collateralUtxo, err := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	lastSlot, err := config.CHAIN_CTX.LastBlockSlot()
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
 	apolloBE, err = apolloBE.
 		AddLoadedUTxOs(userUtxos...).
@@ -46,26 +55,32 @@ func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryIn
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
 
-	log.Println(serialization.PubKeyHash(adminWallet.AdminPKH))
+	fiberLogger.Error(serialization.PubKeyHash(adminWallet.AdminPKH))
 
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	tx := apolloBE.GetTx()
 	txHash, err := tx.TransactionBody.Hash()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	return Utils.ToCbor(tx), hex.EncodeToString(txHash), nil
+	cbor, err := Utils.ToCbor(tx)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	return cbor, hex.EncodeToString(txHash), nil
 
 }

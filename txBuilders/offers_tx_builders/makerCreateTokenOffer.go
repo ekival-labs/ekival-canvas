@@ -5,18 +5,18 @@ import (
 	"ekival-canvas/model"
 	"ekival-canvas/utility"
 	"encoding/hex"
-	"log"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	fiberLogger "github.com/gofiber/fiber/v2/log"
 )
 
 func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.TreasuryInfo, adminWallet *config.AdminWallet) (string, string, error) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			log.Printf("Panic occurred: %v", err)
+			fiberLogger.Panic("Panic occurred: %v", err)
 			return
 		}
 	}()
@@ -27,13 +27,21 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 
 	userUtxos, err := utility.GetUserUTxOs(offer.UserUtxos)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	collateralUtxo := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
+	collateralUtxo, err := config.CHAIN_CTX.GetUtxoFromRef(offer.CollateralUtxo.TxID, offer.CollateralUtxo.TxIDIndex)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
-	lastSlot := config.CHAIN_CTX.LastBlockSlot()
+	lastSlot, err := config.CHAIN_CTX.LastBlockSlot()
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
 
 	apolloBE, err = apolloBE.
 		AddLoadedUTxOs(userUtxos...).
@@ -56,13 +64,13 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 		Complete()
 
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
 	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
@@ -70,10 +78,16 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 
 	txHash, err := tx.TransactionBody.Hash()
 	if err != nil {
-		log.Println(err)
+		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	return Utils.ToCbor(tx), hex.EncodeToString(txHash), nil
+	cbor, err := Utils.ToCbor(tx)
+	if err != nil {
+		fiberLogger.Error(err)
+		return "", "", err
+	}
+
+	return cbor, hex.EncodeToString(txHash), nil
 
 }
