@@ -1,9 +1,10 @@
 package config
 
 import (
-	"ekival-canvas/constants"
 	"encoding/hex"
 	"strings"
+
+	"github.com/ekival-labs/ekival-canvas/constants"
 
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/serialization/Address"
@@ -11,40 +12,40 @@ import (
 	"github.com/blinklabs-io/bursa"
 )
 
-type AdminWallet struct {
+type Wallet struct {
 	AdminPKH  serialization.PubKeyHash
 	AdminVkey Key.VerificationKey
 	AdminSkey Key.SigningKey
 }
 
 var (
-	offerAdminWallet         = &AdminWallet{}
-	adaP2PBuyAdminWallet     = &AdminWallet{}
-	adaP2PSellAdminWallet    = &AdminWallet{}
-	tMoneyP2PBuyAdminWallet  = &AdminWallet{}
-	tMoneyP2PSellAdminWallet = &AdminWallet{}
-	aPBSTAdminWallet         = &AdminWallet{}
-	aPSSTAdminWallet         = &AdminWallet{}
-	tMoneyBSTAdminWallet     = &AdminWallet{}
-	tMoneySSTAdminWallet     = &AdminWallet{}
+	offerAdminWallet         = &Wallet{}
+	adaP2PBuyAdminWallet     = &Wallet{}
+	adaP2PSellAdminWallet    = &Wallet{}
+	tMoneyP2PBuyAdminWallet  = &Wallet{}
+	tMoneyP2PSellAdminWallet = &Wallet{}
+	aPBSTAdminWallet         = &Wallet{}
+	aPSSTAdminWallet         = &Wallet{}
+	tMoneyBSTAdminWallet     = &Wallet{}
+	tMoneySSTAdminWallet     = &Wallet{}
 )
 
 func WalletSetup() {
 
 	cfg := GetGlobalConfig()
 
-	offerAdminWallet = SetAdminWallet(toMnemonic(cfg.OfferAdmin))
-	adaP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BuyAdmin))
-	adaP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SellAdmin))
-	aPBSTAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BSTAdmin))
-	aPSSTAdminWallet = SetAdminWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SSTAdmin))
-	tMoneyP2PBuyAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BuyAdmin))
-	tMoneyP2PSellAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SellAdmin))
-	tMoneyBSTAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BSTAdmin))
-	tMoneySSTAdminWallet = SetAdminWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SSTAdmin))
+	offerAdminWallet = SetWallet(toMnemonic(cfg.OfferAdmin))
+	adaP2PBuyAdminWallet = SetWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BuyAdmin))
+	adaP2PSellAdminWallet = SetWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SellAdmin))
+	aPBSTAdminWallet = SetWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.BSTAdmin))
+	aPSSTAdminWallet = SetWallet(toMnemonic(cfg.ADAMarketplace.AdminWalletsMnemonics.SSTAdmin))
+	tMoneyP2PBuyAdminWallet = SetWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BuyAdmin))
+	tMoneyP2PSellAdminWallet = SetWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SellAdmin))
+	tMoneyBSTAdminWallet = SetWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.BSTAdmin))
+	tMoneySSTAdminWallet = SetWallet(toMnemonic(cfg.TMoneyMarketplace.AdminWalletsMnemonics.SSTAdmin))
 }
 
-func SetAdminWallet(mnemonic string) *AdminWallet {
+func SetWallet(mnemonic string) *Wallet {
 	rootKey, err := bursa.GetRootKeyFromMnemonic(mnemonic)
 	if err != nil {
 		panic(err)
@@ -68,7 +69,7 @@ func SetAdminWallet(mnemonic string) *AdminWallet {
 	sKeyBytes = sKeyBytes[2:]
 	sKeyBytes = append(sKeyBytes[:64], sKeyBytes[96:]...)
 
-	return &AdminWallet{
+	return &Wallet{
 		AdminPKH:  serialization.PubKeyHash(adminAddress.PaymentPart),
 		AdminVkey: Key.VerificationKey{Payload: vKeyBytes},
 		AdminSkey: Key.SigningKey{Payload: sKeyBytes},
@@ -81,38 +82,38 @@ func toMnemonic(seedPhrase string) (mnemonic string) {
 	return mnemonic
 }
 
-func GetOfferAdminWallet() *AdminWallet {
+func GetOfferAdminWallet() *Wallet {
 	return offerAdminWallet
 }
 
-func GetAdaP2PBuyAdminWallet() *AdminWallet {
+func GetAdaP2PBuyAdminWallet() *Wallet {
 	return adaP2PBuyAdminWallet
 }
 
-func GetAdaP2PSellAdminWallet() *AdminWallet {
+func GetAdaP2PSellAdminWallet() *Wallet {
 	return adaP2PSellAdminWallet
 }
 
-func GetTMoneyP2PBuyAdminWallet() *AdminWallet {
+func GetTMoneyP2PBuyAdminWallet() *Wallet {
 	return tMoneyP2PBuyAdminWallet
 }
 
-func GetTMoneyP2PSellAdminWallet() *AdminWallet {
+func GetTMoneyP2PSellAdminWallet() *Wallet {
 	return tMoneyP2PSellAdminWallet
 }
 
-func GetAPBSTAdminWallet() *AdminWallet {
+func GetAPBSTAdminWallet() *Wallet {
 	return aPBSTAdminWallet
 }
 
-func GetAPSSTAdminWallet() *AdminWallet {
+func GetAPSSTAdminWallet() *Wallet {
 	return aPSSTAdminWallet
 }
 
-func GetTMoneyBSTAdminWallet() *AdminWallet {
+func GetTMoneyBSTAdminWallet() *Wallet {
 	return tMoneyBSTAdminWallet
 }
 
-func GetTMoneySSTAdminWallet() *AdminWallet {
+func GetTMoneySSTAdminWallet() *Wallet {
 	return tMoneySSTAdminWallet
 }

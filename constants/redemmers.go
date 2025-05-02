@@ -14,10 +14,10 @@ var (
 			TagNr:          122,
 			Value:          PlutusData.PlutusDefArray{},
 		},
-		ExUnits: Redeemer.ExecutionUnits{
-			Mem:   450_000,
-			Steps: 200_000_000,
-		},
+		// ExUnits: Redeemer.ExecutionUnits{
+		// 	Mem:   450_000,
+		// 	Steps: 200_000_000,
+		// },
 	}
 
 	INDEX_TWO_MINT_REDEEMER *Redeemer.Redeemer = &Redeemer.Redeemer{

@@ -1,46 +1,40 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"log"
-	"net"
-	"net/http"
 	"os"
 
-	"ekival-canvas/config"
-	"ekival-canvas/router"
-
-	"golang.org/x/net/proxy"
+	"github.com/ekival-labs/ekival-canvas/config"
+	"github.com/ekival-labs/ekival-canvas/router"
 )
 
 var cmdlineFlags struct {
 	configFile string
 }
 
-var httpClient *http.Client // Global HTTP client with proxy setup
+// var httpClient *http.Client // Global HTTP client with proxy setup
 
-func init() {
-	// Configure the SOCKS5 proxy
-	proxyAddr := "127.0.0.1:2080"
-	proxyDialer, err := proxy.SOCKS5("tcp", proxyAddr, nil, proxy.Direct)
-	if err != nil {
-		log.Fatalf("Failed to create SOCKS5 dialer: %v", err)
-	}
+// func init() {
+// 	// Configure the SOCKS5 proxy
+// 	proxyAddr := "127.0.0.1:2080"
+// 	proxyDialer, err := proxy.SOCKS5("tcp", proxyAddr, nil, proxy.Direct)
+// 	if err != nil {
+// 		log.Fatalf("Failed to create SOCKS5 dialer: %v", err)
+// 	}
 
-	// Set up the HTTP transport with the proxy
-	transport := &http.Transport{
-		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return proxyDialer.Dial(network, addr)
-		},
-	}
+// 	// Set up the HTTP transport with the proxy
+// 	transport := &http.Transport{
+// 		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+// 			return proxyDialer.Dial(network, addr)
+// 		},
+// 	}
 
-	// Set the default HTTP transport globally
-	http.DefaultTransport = transport
+// 	// Set the default HTTP transport globally
+// 	http.DefaultTransport = transport
 
-	log.Println("Proxy initialized globally.")
-}
+// 	log.Println("Proxy initialized globally.")
+// }
 
 func main() {
 

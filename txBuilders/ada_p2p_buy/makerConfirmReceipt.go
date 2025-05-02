@@ -56,7 +56,7 @@ package ada_p2p_buy
 
 // cborString, txHash, err := ada_p2p_buy.MakerConfirmReceipt(orderInfo, config.GetAda_P2PBuyAdminWallet())
 
-// func MakerConfirmReceipt(order *model.Order, treasury *model.TreasuryInfo, adminWallet *config.AdminWallet) (string, string, error) {
+// func MakerConfirmReceipt(order *model.Order, treasury *model.TreasuryInfo, adminWallet *config.Wallet) (string, string, error) {
 
 // 	// defer func() {
 // 	// 	if err := recover(); err != nil {

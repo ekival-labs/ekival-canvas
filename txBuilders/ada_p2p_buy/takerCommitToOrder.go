@@ -1,13 +1,14 @@
 package ada_p2p_buy
 
 import (
-	"ekival-canvas/config"
-	"ekival-canvas/constants"
-	"ekival-canvas/model"
-	"ekival-canvas/plutusEncoder"
-	"ekival-canvas/utility"
 	"encoding/hex"
 	"fmt"
+
+	"github.com/ekival-labs/ekival-canvas/config"
+	"github.com/ekival-labs/ekival-canvas/constants"
+	"github.com/ekival-labs/ekival-canvas/model"
+	"github.com/ekival-labs/ekival-canvas/plutusEncoder"
+	"github.com/ekival-labs/ekival-canvas/utility"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
@@ -94,7 +95,7 @@ import (
 // }
 
 // cborString, txHash, err := ada_p2p_buy.TakerCommitToOrder(orderInfo, config.GetAda_P2PBuyAdminWallet())
-func TakerCommitToOrder(order *model.Order, adminWallet *config.AdminWallet) (string, string, error) {
+func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string, string, error) {
 
 	// defer func() {
 	// 	if err := recover(); err != nil {

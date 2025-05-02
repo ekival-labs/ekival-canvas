@@ -1,10 +1,11 @@
 package offers_tx_builders
 
 import (
-	"ekival-canvas/config"
-	"ekival-canvas/model"
-	"ekival-canvas/utility"
 	"encoding/hex"
+
+	"github.com/ekival-labs/ekival-canvas/config"
+	"github.com/ekival-labs/ekival-canvas/model"
+	"github.com/ekival-labs/ekival-canvas/utility"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
@@ -12,7 +13,7 @@ import (
 	fiberLogger "github.com/gofiber/fiber/v2/log"
 )
 
-func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.TreasuryInfo, adminWallet *config.AdminWallet) (string, string, error) {
+func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.TreasuryInfo, adminWallet *config.Wallet) (string, string, error) {
 
 	defer func() {
 		if err := recover(); err != nil {

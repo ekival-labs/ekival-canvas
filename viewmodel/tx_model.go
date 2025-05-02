@@ -1,8 +1,9 @@
 package viewmodel
 
 import (
-	"ekival-canvas/model"
 	"fmt"
+
+	"github.com/ekival-labs/ekival-canvas/model"
 )
 
 type UserTxInfo struct {
@@ -49,7 +50,7 @@ func (u *UserTxInfo) IsValid() error {
 }
 
 func (t *TxResponse) IsValid() error {
-	if t.TxCBOR == "" || t.TxID == "" {
+	if t.TxCBOR == "" {
 		return fmt.Errorf("error at IsValid: one or more fields are empty")
 	}
 	return nil

@@ -1,6 +1,6 @@
 package vars
 
-import "ekival-canvas/utility"
+import "github.com/ekival-labs/ekival-canvas/utility"
 
 var (
 	toLovelace int64 = 1000000
