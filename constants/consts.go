@@ -1,14 +1,16 @@
 package constants
 
 const (
-	NETWORK            string = "preprod"
-	BFC_NETWORK_ID     int    = 0
-	MAESTRO_NETWORK_ID int    = 3 // preprod
-	BFC_API_URL        string = "https://cardano-preprod.blockfrost.io/api"
-	BFC_API_KEY        string = "preprod9zzl4g8Xa3faU50a1OVDZdPeQ92ZsdcT"
-	MAESTRO_API_KEY    string = "so4a45BCnj80EdcFa9OwLr8pK8um4bWE"
-	OGMIGO_ENDPOINT    string = "ws://localhost:1337"
-	KUGO_ENDPOINT      string = "http://localhost:1442"
+	NETWORK                   string = "preprod"
+	BFC_NETWORK_ID            int    = 0
+	MAESTRO_NETWORK_ID        int    = 3 // preprod
+	BFC_API_URL               string = "https://cardano-preprod.blockfrost.io/api"
+	BFC_API_KEY               string = "preprod9zzl4g8Xa3faU50a1OVDZdPeQ92ZsdcT"
+	MAESTRO_API_KEY           string = "so4a45BCnj80EdcFa9OwLr8pK8um4bWE"
+	OGMIOS_ENDPOINT           string = "ws://localhost:1337"
+	KUPO_ENDPOINT             string = "http://localhost:1442"
+	BLINKLABS_KUPO_ENDPOINT   string = "https://kupo-preprod.blinklabs.io"
+	BLINKLABS_OGMIOS_ENDPOINT string = "https://ogmios-preprod.blinklabs.io"
 
 	EKIVAL_FEE int = 25_000_000
 

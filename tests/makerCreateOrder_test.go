@@ -8,8 +8,10 @@ import (
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/serialization/Address"
-	"github.com/Salvionied/apollo/txBuilding/Backend/MaestroChainContext"
+	"github.com/Salvionied/apollo/txBuilding/Backend/OgmiosChainContext"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	"github.com/SundaeSwap-finance/kugo"
+	"github.com/SundaeSwap-finance/ogmigo"
 	"github.com/ekival-labs/ekival-canvas/config"
 	"github.com/ekival-labs/ekival-canvas/constants"
 	"github.com/ekival-labs/ekival-canvas/model"
@@ -45,14 +47,15 @@ const (
 
 	ADA_P2P_BUY_FEE_TYPE int = 1
 
-	NETWORK            string = "preprod"
-	BFC_NETWORK_ID     int    = 0
-	MAESTRO_NETWORK_ID int    = 3 // preprod
-	BFC_API_URL        string = "https://cardano-preprod.blockfrost.io/api"
-	BFC_API_KEY        string = "preprod9zzl4g8Xa3faU50a1OVDZdPeQ92ZsdcT"
-	MAESTRO_API_KEY    string = "so4a45BCnj80EdcFa9OwLr8pK8um4bWE"
-	OGMIGO_ENDPOINT    string = "ws://localhost:1337"
-	KUGO_ENDPOINT      string = "http://localhost:1442"
+	NETWORK                   string = "preprod"
+	BFC_NETWORK_ID            int    = 0
+	MAESTRO_NETWORK_ID        int    = 3 // preprod
+	BFC_API_URL               string = "https://cardano-preprod.blockfrost.io/api"
+	BFC_API_KEY               string = "preprod9zzl4g8Xa3faU50a1OVDZdPeQ92ZsdcT"
+	MAESTRO_API_KEY           string = "so4a45BCnj80EdcFa9OwLr8pK8um4bWE"
+	KUPO_ENDPOINT             string = "http://localhost:1442"
+	BLINKLABS_KUPO_ENDPOINT   string = "https://preprod-kupo.blinklabs.io"
+	BLINKLABS_OGMIOS_ENDPOINT string = "wss://preprod-ogmios.blinklabs.io"
 
 	EKIVAL_FEE int = 25_000_000
 )
@@ -91,12 +94,12 @@ var (
 )
 
 func TestMakerCreateOrder(t *testing.T) {
-	// be := OgmiosChainContext.NewOgmiosChainContext(*ogmigo.New(ogmigo.WithEndpoint(OGMIGO_ENDPOINT)), *kugo.New(kugo.WithEndpoint(KUGO_ENDPOINT)))
+	be := OgmiosChainContext.NewOgmiosChainContext(*ogmigo.New(ogmigo.WithEndpoint(BLINKLABS_OGMIOS_ENDPOINT)), *kugo.New(kugo.WithEndpoint(BLINKLABS_KUPO_ENDPOINT)))
 
-	be, err := MaestroChainContext.NewMaestroChainContext(
-		MAESTRO_NETWORK_ID,
-		MAESTRO_API_KEY,
-	)
+	// be, err := MaestroChainContext.NewMaestroChainContext(
+	// 	MAESTRO_NETWORK_ID,
+	// 	MAESTRO_API_KEY,
+	// )
 
 	// be, err := BlockFrostChainContext.NewBlockfrostChainContext(
 	// 	BFC_API_URL,
@@ -104,9 +107,9 @@ func TestMakerCreateOrder(t *testing.T) {
 	// 	BFC_API_KEY,
 	// )
 
-	if err != nil {
-		t.Error(err)
-	}
+	// if err != nil {
+	// 	t.Error(err)
+	// }
 
 	ma, err := Address.DecodeAddress(MAKER_ADDRESS)
 	if err != nil {
