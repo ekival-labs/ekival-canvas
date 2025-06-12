@@ -8,10 +8,8 @@ import (
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/serialization/Address"
-	"github.com/Salvionied/apollo/txBuilding/Backend/OgmiosChainContext"
+	"github.com/Salvionied/apollo/txBuilding/Backend/MaestroChainContext"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
-	"github.com/SundaeSwap-finance/kugo"
-	"github.com/SundaeSwap-finance/ogmigo"
 	"github.com/ekival-labs/ekival-canvas/config"
 	"github.com/ekival-labs/ekival-canvas/constants"
 	"github.com/ekival-labs/ekival-canvas/model"
@@ -94,12 +92,12 @@ var (
 )
 
 func TestMakerCreateOrder(t *testing.T) {
-	be := OgmiosChainContext.NewOgmiosChainContext(*ogmigo.New(ogmigo.WithEndpoint(BLINKLABS_OGMIOS_ENDPOINT)), *kugo.New(kugo.WithEndpoint(BLINKLABS_KUPO_ENDPOINT)))
+	// be := OgmiosChainContext.NewOgmiosChainContext(*ogmigo.New(ogmigo.WithEndpoint(BLINKLABS_OGMIOS_ENDPOINT)), *kugo.New(kugo.WithEndpoint(BLINKLABS_KUPO_ENDPOINT)))
 
-	// be, err := MaestroChainContext.NewMaestroChainContext(
-	// 	MAESTRO_NETWORK_ID,
-	// 	MAESTRO_API_KEY,
-	// )
+	be, err := MaestroChainContext.NewMaestroChainContext(
+		MAESTRO_NETWORK_ID,
+		MAESTRO_API_KEY,
+	)
 
 	// be, err := BlockFrostChainContext.NewBlockfrostChainContext(
 	// 	BFC_API_URL,
@@ -211,7 +209,7 @@ func TestMakerCreateOrder(t *testing.T) {
 				},
 				*constants.INDEX_ONE_MINT_REDEEMER,
 			).
-			AddReferenceInput(
+			AddReferenceInputV3(
 				mockOrder.OrderTxInfo.StateTokenRefUtxo.TxID,
 				mockOrder.OrderTxInfo.StateTokenRefUtxo.TxIDIndex,
 			).

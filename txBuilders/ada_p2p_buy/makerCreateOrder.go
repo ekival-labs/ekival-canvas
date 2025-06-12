@@ -145,7 +145,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.Wallet) (string, s
 			},
 			*constants.INDEX_ONE_MINT_REDEEMER,
 		).
-		AddReferenceInput(
+		AddReferenceInputV3(
 			order.OrderTxInfo.StateTokenRefUtxo.TxID,
 			order.OrderTxInfo.StateTokenRefUtxo.TxIDIndex,
 		).

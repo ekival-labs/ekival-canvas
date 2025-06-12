@@ -1,11 +1,15 @@
 package ada_buy_handlers
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"log"
+	"testing"
 	"time"
 
+	"github.com/Salvionied/apollo/serialization/Address"
+	"github.com/Salvionied/apollo/serialization/PlutusData"
 	"github.com/ekival-labs/ekival-canvas/config"
 	"github.com/ekival-labs/ekival-canvas/constants"
 	"github.com/ekival-labs/ekival-canvas/errors"
@@ -13,8 +17,6 @@ import (
 	"github.com/ekival-labs/ekival-canvas/txBuilders/ada_p2p_buy"
 	"github.com/ekival-labs/ekival-canvas/utility"
 	"github.com/ekival-labs/ekival-canvas/viewmodel"
-
-	"github.com/Salvionied/apollo/serialization/Address"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -174,5 +176,26 @@ func MakerCreateAdaBuyOrderHandler(c *fiber.Ctx) error {
 
 	c.Status(fiber.StatusOK)
 	return enc.Encode(res)
+
+}
+
+func TestScriptAddress(t *testing.T) {
+	SC_CBOR := "SCRIPT_CBOR"
+	decoded_string, err := hex.DecodeString(SC_CBOR)
+	if err != nil {
+		t.Error(err)
+	}
+	p2Script := PlutusData.PlutusV3Script(decoded_string)
+	scriptaddress := p2Script.ToAddress(([]byte("STAKING_PART_SCRIPT_HASH")), Address.TESTNET)
+	if hex.EncodeToString(
+		scriptaddress.Bytes(),
+	) != "PAYMENT_PART_SCRIPT_HASH" {
+		t.Error(
+			"Hash of script is not correct",
+			hex.EncodeToString(scriptaddress.Bytes()),
+			" != ",
+			"PAYMENT_PART_SCRIPT_HASH",
+		)
+	}
 
 }
