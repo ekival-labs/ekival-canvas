@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/ekival-labs/ekival-canvas/constants"
+	"ekival-canvas/constants"
 
 	"github.com/Salvionied/apollo/txBuilding/Backend/MaestroChainContext"
 )

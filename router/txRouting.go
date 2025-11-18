@@ -3,11 +3,11 @@ package router
 import (
 	"log"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/handlers/ada_buy_handlers"
-	"github.com/ekival-labs/ekival-canvas/handlers/offers_handlers"
-	"github.com/ekival-labs/ekival-canvas/handlers/submit_handlers"
-	"github.com/ekival-labs/ekival-canvas/handlers/token_buy_handlers"
+	"ekival-canvas/config"
+	"ekival-canvas/handlers/ada_buy_handlers"
+	"ekival-canvas/handlers/offers_handlers"
+	"ekival-canvas/handlers/submit_handlers"
+	"ekival-canvas/handlers/token_buy_handlers"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"

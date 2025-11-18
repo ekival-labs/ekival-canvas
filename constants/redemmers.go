@@ -11,7 +11,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          122,
+			TagNr:          INDEX_ONE,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 		// ExUnits: Redeemer.ExecutionUnits{
@@ -25,7 +25,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          123,
+			TagNr:          INDEX_TWO,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}

@@ -5,13 +5,13 @@ import (
 	"io"
 	"log"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/constants"
-	"github.com/ekival-labs/ekival-canvas/errors"
-	"github.com/ekival-labs/ekival-canvas/model"
-	"github.com/ekival-labs/ekival-canvas/txBuilders/offers_tx_builders"
-	"github.com/ekival-labs/ekival-canvas/utility"
-	"github.com/ekival-labs/ekival-canvas/viewmodel"
+	"ekival-canvas/config"
+	"ekival-canvas/constants"
+	"ekival-canvas/errors"
+	"ekival-canvas/model"
+	"ekival-canvas/txBuilders/offers_tx_builders"
+	"ekival-canvas/utility"
+	"ekival-canvas/viewmodel"
 
 	"github.com/Salvionied/apollo/serialization/Address"
 	"github.com/gofiber/fiber/v2"
@@ -93,7 +93,6 @@ func MakerCreateOfferHandler(c *fiber.Ctx) error {
 	if cborString == "" || txHash == "" || err != nil {
 		return errors.TxError(c)
 	}
-
 
 	res := &viewmodel.TxResponse{}
 	res.TxCBOR = cborString

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/router"
+	"ekival-canvas/config"
+	"ekival-canvas/router"
 )
 
 var cmdlineFlags struct {

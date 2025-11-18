@@ -1,0 +1,153 @@
+package ada_buy_handlers
+
+import (
+	"encoding/json"
+	"io"
+	"log"
+
+	"ekival-canvas/config"
+	"ekival-canvas/constants"
+	"ekival-canvas/errors"
+	"ekival-canvas/model"
+	"ekival-canvas/txBuilders/ada_p2p_buy"
+	"ekival-canvas/utility"
+	"ekival-canvas/viewmodel"
+
+	"github.com/Salvionied/apollo/serialization/Address"
+	"github.com/gofiber/fiber/v2"
+)
+
+// TakerCancelAdaBuyOrderHandler cancels an ADA buy order by taker.
+func TakerCancelAdaBuyOrderHandler(c *fiber.Ctx) error {
+	var u *viewmodel.UserTxInfo
+
+	enc := json.NewEncoder(c.Response().BodyWriter())
+	enc.SetIndent("", "    ")
+
+	c.Response().Header.Set("Content-Type", "application/json")
+	c.Response().Header.Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header.Set("Access-Control-Allow-Methods", "POST")
+
+	err := c.BodyParser(&u)
+	if err != nil {
+		log.Println(err)
+		return errors.BadRequestErrorHandler(c, err)
+	}
+
+	switch {
+	case err == io.EOF:
+		err := enc.Encode(errors.GeneralError("Nothing Was Sent"))
+		if err != nil {
+			log.Println(err)
+			return errors.ServerErrorHandler(c, err)
+		}
+		return err
+	}
+
+	if u.IsValid() != nil {
+		err := enc.Encode(errors.FieldError("Address", "ChangeAddress", "UserUTxOs"))
+		if err != nil {
+			log.Println(err)
+			return errors.ServerErrorHandler(c, err)
+		}
+		return err
+	}
+
+	cfg := config.GetGlobalConfig()
+
+	ma, err := Address.DecodeAddress(u.MakerAddress)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	ta, err := Address.DecodeAddress(u.TakerAddress)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	changeAddress, err := Address.DecodeAddress(u.ChangeAddress)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	treasuryAddress, err := Address.DecodeAddress(cfg.MainTreasury.Address)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	treasuryInfo := &model.TreasuryInfo{
+		Address: treasuryAddress,
+		Datum:   utility.CreateSimpleDatum(constants.INDEX_ONE, constants.ADA_P2P_BUY_FEE_TYPE),
+	}
+
+	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
+	takerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.TakerPct, u.TakerMinFee)
+	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	cancelFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CancelPct, u.CancelMinFee)
+
+	orderInfo := &model.Order{
+		OrderInfo: model.OrderInfo{
+			OrderId:       u.OrderId,
+			OrderAmount:   u.OrderAmount,
+			MakerAddress:  ma,
+			TakerAddress:  ta,
+			MakerDeadline: u.MakerDeadline,
+			TakerDeadline: u.TakerDeadline,
+		},
+		BrokerageInfo: model.BrokerageInfo{
+			Precision:      u.Precision,
+			CollateralPct:  u.CollateralPct,
+			MakerPct:       u.MakerPct,
+			TakerPct:       u.TakerPct,
+			CancelPct:      u.CancelPct,
+			MinCollateral:  u.MinCollateral,
+			MakerMinFee:    u.MakerMinFee,
+			TakerMinFee:    u.TakerMinFee,
+			CancelMinFee:   u.CancelMinFee,
+			MinOrderAmount: u.MinOrderAmount,
+			OrderThreshold: u.OrderThreshold,
+			CancelPenalty:  u.CancelPenalty,
+		},
+		// Taker cancels only when order is in committed / active state.
+		TradeState: constants.COMMITTED_ORDER_STATUS,
+		OrderTxInfo: model.OrderTxInfo{
+			EscrowContractRefUtxo: model.EUTxO{
+				TxID:      cfg.ADAMarketplace.AdaP2PBuyEscrow.RefTxID,
+				TxIDIndex: cfg.ADAMarketplace.AdaP2PBuyEscrow.RefTxIDx,
+			},
+			StateTokenPolicyId: cfg.ADAMarketplace.APBST.PolicyID,
+			StateTokenRefUtxo: model.EUTxO{
+				TxID:      cfg.ADAMarketplace.APBST.RefTxID,
+				TxIDIndex: cfg.ADAMarketplace.APBST.RefTxIDx,
+			},
+			MakerFee:         makerFee,
+			TakerFee:         takerFee,
+			CollateralAmount: collateralAmount,
+			CancelFee:        cancelFee,
+			ChangeAddress:    changeAddress,
+			UserUtxos:        u.UserUTxOs,
+			CollateralUtxo:   u.CollateralUTxO,
+			OrderUtxo: model.EUTxO{
+				TxID:      u.OrderUtxo.TxID,
+				TxIDIndex: u.OrderUtxo.TxIDIndex,
+			},
+		},
+	}
+
+	cborString, txHash, err := ada_p2p_buy.TakerCancelOrder(orderInfo, treasuryInfo, config.GetAdaP2PBuyAdminWallet())
+	if cborString == "" || txHash == "" || err != nil {
+		return errors.TxError(c)
+	}
+
+	res := &viewmodel.TxResponse{
+		TxCBOR: cborString,
+		TxID:   txHash,
+	}
+
+	c.Status(fiber.StatusOK)
+	return enc.Encode(res)
+}

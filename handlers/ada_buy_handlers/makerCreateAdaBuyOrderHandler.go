@@ -8,15 +8,15 @@ import (
 	"testing"
 	"time"
 
+	"ekival-canvas/config"
+	"ekival-canvas/constants"
+	"ekival-canvas/errors"
+	"ekival-canvas/model"
+	"ekival-canvas/txBuilders/ada_p2p_buy"
+	"ekival-canvas/utility"
+	"ekival-canvas/viewmodel"
 	"github.com/Salvionied/apollo/serialization/Address"
 	"github.com/Salvionied/apollo/serialization/PlutusData"
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/constants"
-	"github.com/ekival-labs/ekival-canvas/errors"
-	"github.com/ekival-labs/ekival-canvas/model"
-	"github.com/ekival-labs/ekival-canvas/txBuilders/ada_p2p_buy"
-	"github.com/ekival-labs/ekival-canvas/utility"
-	"github.com/ekival-labs/ekival-canvas/viewmodel"
 	"github.com/gofiber/fiber/v2"
 )
 

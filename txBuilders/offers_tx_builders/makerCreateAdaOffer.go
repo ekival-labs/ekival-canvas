@@ -3,9 +3,9 @@ package offers_tx_builders
 import (
 	"encoding/hex"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/model"
-	"github.com/ekival-labs/ekival-canvas/utility"
+	"ekival-canvas/config"
+	"ekival-canvas/model"
+	"ekival-canvas/utility"
 
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"

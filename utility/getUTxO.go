@@ -3,8 +3,8 @@ package utility
 import (
 	"errors"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/model"
+	"ekival-canvas/config"
+	"ekival-canvas/model"
 
 	"github.com/Salvionied/apollo/serialization/UTxO"
 )

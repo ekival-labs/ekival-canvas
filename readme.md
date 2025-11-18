@@ -1,4 +1,4 @@
-# EKIVAL-Canvas: Backend Transaction Building APIs for Ekival Server
+# EKIVAL-Canvas: Backend Transaction Building APIs Testing for Ekival Server
 
 ## Introduction
 
@@ -14,7 +14,7 @@ EKIVAL-Canvas is a Golang backend service that provides APIs for building transa
 ## Installation & Usage
 
 1. **Dependencies:** Go 1.21+ (`go version`)
-2. **Clone the Repository:** `git clone https://github.com/ekival-labs/ekival-canvas.git`
+2. **Clone the Repository:** `git clone https://ekival-canvas.git`
 3. **Change directory:** `cd ekival-canvas`
 4. **Create build folder:** `mkdir build`
 5. **Build the Binary:** `go build -o ./build/`

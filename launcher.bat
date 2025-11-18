@@ -1,2 +1,0 @@
-go build -o "E:\Computer Eng\Projects\Ekival\ekival-canvas\build\ekival-canvas"
-"C:\Program Files\proxychains_0.6.8_win32_x64\proxychains_win32_x64.exe" -f "C:\Program Files\proxychains_0.6.8_win32_x64\proxychains.conf" "E:\Computer Eng\Projects\Ekival\ekival-canvas\build\ekival-canvas" -config "E:\Computer Eng\Projects\Ekival\ekival-canvas\config\config.json"

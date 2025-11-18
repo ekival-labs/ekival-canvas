@@ -3,9 +3,9 @@ package submit_handlers
 import (
 	"log"
 
-	"github.com/ekival-labs/ekival-canvas/errors"
-	"github.com/ekival-labs/ekival-canvas/txBuilders/tx_submits"
-	"github.com/ekival-labs/ekival-canvas/viewmodel"
+	"ekival-canvas/errors"
+	"ekival-canvas/txBuilders/tx_submits"
+	"ekival-canvas/viewmodel"
 
 	"github.com/gofiber/fiber/v2"
 )

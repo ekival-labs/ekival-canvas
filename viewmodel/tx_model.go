@@ -3,7 +3,7 @@ package viewmodel
 import (
 	"fmt"
 
-	"github.com/ekival-labs/ekival-canvas/model"
+	"ekival-canvas/model"
 )
 
 type UserTxInfo struct {

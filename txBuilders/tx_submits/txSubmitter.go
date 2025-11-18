@@ -4,8 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/ekival-labs/ekival-canvas/config"
-	"github.com/ekival-labs/ekival-canvas/viewmodel"
+	"ekival-canvas/config"
+	"ekival-canvas/viewmodel"
 
 	"github.com/Salvionied/apollo"
 	fiberLogger "github.com/gofiber/fiber/v2/log"
