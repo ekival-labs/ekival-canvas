@@ -51,19 +51,19 @@ func MakerCreateAdaOffer(offer *model.AdaOfferTxInfo, treasury *model.TreasuryIn
 		PayToContract(
 			treasury.Address, treasury.Datum, offer.EkivalFeeLovelace, true,
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(offer.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
 
-	fiberLogger.Error(serialization.PubKeyHash(adminWallet.AdminPKH))
+	fiberLogger.Error(serialization.PubKeyHash(adminWallet.PKH))
 
 	if err != nil {
 		fiberLogger.Error(err)
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		fiberLogger.Error(err)
 		return "", "", err

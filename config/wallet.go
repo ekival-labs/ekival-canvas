@@ -13,9 +13,10 @@ import (
 )
 
 type Wallet struct {
-	AdminPKH  serialization.PubKeyHash
-	AdminVkey Key.VerificationKey
-	AdminSkey Key.SigningKey
+	Address Address.Address
+	PKH     serialization.PubKeyHash
+	Vkey    Key.VerificationKey
+	Skey    Key.SigningKey
 }
 
 var (
@@ -52,7 +53,7 @@ func SetWallet(mnemonic string) *Wallet {
 	}
 	accountKey := bursa.GetAccountKey(rootKey, 0)
 	paymentKey := bursa.GetPaymentKey(accountKey, 0)
-	adminAddress, err := Address.DecodeAddress(bursa.GetAddress(accountKey, constants.NETWORK, 0).String())
+	address, err := Address.DecodeAddress(bursa.GetAddress(accountKey, constants.NETWORK, 0).String())
 	if err != nil {
 		panic(err)
 	}
@@ -70,9 +71,10 @@ func SetWallet(mnemonic string) *Wallet {
 	sKeyBytes = append(sKeyBytes[:64], sKeyBytes[96:]...)
 
 	return &Wallet{
-		AdminPKH:  serialization.PubKeyHash(adminAddress.PaymentPart),
-		AdminVkey: Key.VerificationKey{Payload: vKeyBytes},
-		AdminSkey: Key.SigningKey{Payload: sKeyBytes},
+		Address: address,
+		PKH:     serialization.PubKeyHash(address.PaymentPart),
+		Vkey:    Key.VerificationKey{Payload: vKeyBytes},
+		Skey:    Key.SigningKey{Payload: sKeyBytes},
 	}
 }
 

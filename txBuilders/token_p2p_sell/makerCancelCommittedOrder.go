@@ -173,7 +173,7 @@ func MakerCancelCommittedOrder(order *model.Order, treasury *model.TreasuryInfo,
 				Name:     order.OrderInfo.TradeTokenName,
 				Quantity: int(payToTakerAmount),
 			}).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		SetValidityStart(int64(lastSlot)).
@@ -184,7 +184,7 @@ func MakerCancelCommittedOrder(order *model.Order, treasury *model.TreasuryInfo,
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Println(err)
 		return "", "", err

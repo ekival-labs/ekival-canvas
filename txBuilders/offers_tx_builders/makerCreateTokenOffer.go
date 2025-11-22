@@ -59,7 +59,7 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 				Quantity: offer.EkivalFeeToken,
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(offer.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -69,7 +69,7 @@ func MakerCreateTokenOffer(offer *model.TokenOfferTxInfo, treasury *model.Treasu
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		fiberLogger.Error(err)
 		return "", "", err

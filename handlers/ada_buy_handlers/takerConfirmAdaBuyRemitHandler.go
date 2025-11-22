@@ -79,9 +79,21 @@ func TakerConfirmAdaBuyRemitHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	takerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.TakerPct, u.TakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	takerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.TakerMinFee, u.TakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	orderInfo := &model.Order{
 		OrderInfo: model.OrderInfo{

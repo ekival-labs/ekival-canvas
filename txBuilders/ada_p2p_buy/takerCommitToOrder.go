@@ -11,10 +11,10 @@ import (
 	"ekival-canvas/plutusEncoder"
 	"ekival-canvas/utility"
 
-	"github.com/rs/zerolog/log"
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	"github.com/rs/zerolog/log"
 )
 
 // cfg := config.GetGlobalConfig()
@@ -293,7 +293,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string,
 		AddCollateral(*collateralUtxo).
 		AddLoadedUTxOs(userUtxos...).
 		CollectFrom(*orderUTxO, *constants.INDEX_TWO_SPEND_REDEEMER).
-		AddReferenceInput(
+		AddReferenceInputV3(
 			order.OrderTxInfo.EscrowContractRefUtxo.TxID,
 			order.OrderTxInfo.EscrowContractRefUtxo.TxIDIndex,
 		).
@@ -304,7 +304,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string,
 				Quantity: int(1),
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.TakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -324,7 +324,24 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string,
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	currentFee := apolloBE.Fee
+	log.Debug().
+		Str("function", "TakerCommitToOrder").
+		Str("order_id", order.OrderInfo.OrderId).
+		Int64("current_fee", currentFee).
+		Msg("Current fee retrieved")
+
+	anotherCurrentFee := apolloBE.GetTx().TransactionBody.Fee
+	log.Debug().
+		Str("function", "TakerCommitToOrder").
+		Str("order_id", order.OrderInfo.OrderId).
+		Int64("another_current_fee", anotherCurrentFee).
+		Msg("Another current fee retrieved")
+
+	apolloBE, err = apolloBE.
+		SetFeePadding(currentFee + 10000).Complete()
+
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

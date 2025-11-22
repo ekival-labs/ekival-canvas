@@ -35,7 +35,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          122,
+			TagNr:          INDEX_ONE,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -45,7 +45,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          123,
+			TagNr:          INDEX_TWO,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -55,7 +55,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          124,
+			TagNr:          INDEX_THREE,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -65,7 +65,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          125,
+			TagNr:          INDEX_FOUR,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -75,7 +75,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          126,
+			TagNr:          INDEX_FIVE,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -85,7 +85,7 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          126,
+			TagNr:          INDEX_SIX,
 			Value:          PlutusData.PlutusDefArray{},
 		},
 	}
@@ -95,13 +95,13 @@ var (
 		Index: 0,
 		Data: PlutusData.PlutusData{
 			PlutusDataType: PlutusData.PlutusArray,
-			TagNr:          1280,
+			TagNr:          INDEX_SEVEN,
 			Value: PlutusData.PlutusDefArray{
 				PlutusData.PlutusData{
 					TagNr: 0,
 					Value: PlutusData.PlutusData{
 						PlutusDataType: PlutusData.PlutusArray,
-						TagNr:          122,
+						TagNr:          INDEX_ONE,
 						Value:          PlutusData.PlutusDefArray{},
 					},
 				},

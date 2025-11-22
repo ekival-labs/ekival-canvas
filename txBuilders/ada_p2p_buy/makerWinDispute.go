@@ -11,11 +11,11 @@ import (
 	"ekival-canvas/plutusEncoder"
 	"ekival-canvas/utility"
 
-	"github.com/rs/zerolog/log"
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/serialization/Redeemer"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	"github.com/rs/zerolog/log"
 )
 
 // cfg := config.GetGlobalConfig()
@@ -328,7 +328,7 @@ func MakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 		).
 		PayToAddress(order.OrderInfo.MakerAddress, int(payToMakerAmount)).
 		PayToAddress(order.OrderInfo.TakerAddress, int(payToTakerAmount)).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		SetValidityStart(int64(lastSlot)).
@@ -349,7 +349,7 @@ func MakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

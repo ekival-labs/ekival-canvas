@@ -305,7 +305,7 @@ func MakerConfirmRemit(order *model.Order, adminWallet *config.Wallet) (string, 
 				Quantity: int(1),
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -325,7 +325,7 @@ func MakerConfirmRemit(order *model.Order, adminWallet *config.Wallet) (string, 
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

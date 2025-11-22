@@ -1,10 +1,15 @@
 package utility
 
-func CalculateFee(precision int64, orderAmount, orderThreshold, feePercentage, minFee int64) int64 {
-	if orderAmount <= orderThreshold {
-		return minFee
+import (
+	"errors"
+)
+
+func CalculateFee(precision, orderThreshold, minOrder, minFee, feePercentage, orderAmount int64) (int64, error) {
+	if orderAmount <= orderThreshold && orderAmount >= minOrder {
+		return minFee, nil
+	} else if orderAmount > orderThreshold {
+		return (orderAmount * precision) / feePercentage, nil
 	} else {
-		result := ((orderAmount * int64(precision)) / feePercentage)
-		return result
+		return 0, errors.New("Order amount does not meet criteria")
 	}
 }

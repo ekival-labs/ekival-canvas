@@ -84,10 +84,26 @@ func TakerCancelAdaBuyOrderHandler(c *fiber.Ctx) error {
 		Datum:   utility.CreateSimpleDatum(constants.INDEX_ONE, constants.ADA_P2P_BUY_FEE_TYPE),
 	}
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	takerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.TakerPct, u.TakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
-	cancelFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CancelPct, u.CancelMinFee)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	takerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.TakerMinFee, u.TakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	cancelFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.CancelMinFee, u.CancelPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	orderInfo := &model.Order{
 		OrderInfo: model.OrderInfo{

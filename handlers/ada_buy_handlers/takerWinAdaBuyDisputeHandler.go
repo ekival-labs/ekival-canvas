@@ -90,9 +90,21 @@ func TakerWinAdaBuyDisputeHandler(c *fiber.Ctx) error {
 		Datum:   utility.CreateSimpleDatum(constants.INDEX_ONE, constants.ADA_P2P_BUY_FEE_TYPE),
 	}
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	takerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.TakerPct, u.TakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	takerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.TakerMinFee, u.TakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	// Dispute fee configuration currently comes from backend/on-chain state; here we keep it zero.
 	var disputeFee int64 = 0
 

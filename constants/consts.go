@@ -6,13 +6,15 @@ const (
 	MAESTRO_NETWORK_ID        int    = 3 // preprod
 	BFC_API_URL               string = "https://cardano-preprod.blockfrost.io/api"
 	BFC_API_KEY               string = "preprodLRHR4UwMuz7TuVOGtRJPcUIvcBDjy9Oz"
-	MAESTRO_API_KEY           string = "so4a45BCnj80EdcFa9OwLr8pK8um4bWE"
+	MAESTRO_API_KEY           string = "bODB5wkcG0EGkBgFRHPkSgqQQ186WoTB"
 	OGMIOS_ENDPOINT           string = "ws://localhost:1337"
 	KUPO_ENDPOINT             string = "http://localhost:1442"
 	BLINKLABS_KUPO_ENDPOINT   string = "https://kupo-preprod.blinklabs.io"
 	BLINKLABS_OGMIOS_ENDPOINT string = "https://ogmios-preprod.blinklabs.io"
 
 	EKIVAL_FEE int = 25_000_000
+
+	MIN_COLLATERAL_ADA int64 = 5_000_000 // 5 ADA
 
 	UNCOMMITTED_ORDER_STATUS string = "UNCOMMITTED_ORDER"
 	COMMITTED_ORDER_STATUS   string = "COMMITTED_ORDER"

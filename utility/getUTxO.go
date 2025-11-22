@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"encoding/hex"
 	"errors"
 
 	"ekival-canvas/config"
@@ -22,4 +23,15 @@ func GetUserUTxOs(userUTxOs []model.EUTxO) ([]UTxO.UTxO, error) {
 		totalUTxOs = append(totalUTxOs, *utxo)
 	}
 	return totalUTxOs, nil
+}
+
+func CreateEUTxOs(utxos []UTxO.UTxO) []model.EUTxO {
+	var eUTxOs []model.EUTxO
+	for _, utxo := range utxos {
+		eUTxOs = append(eUTxOs, model.EUTxO{
+			TxID:      hex.EncodeToString(utxo.Input.TransactionId),
+			TxIDIndex: int(utxo.Input.Index),
+		})
+	}
+	return eUTxOs
 }

@@ -67,8 +67,16 @@ func MakerCancelAdaBuyUncommittedOrderHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	orderInfo := &model.Order{
 		OrderInfo: model.OrderInfo{

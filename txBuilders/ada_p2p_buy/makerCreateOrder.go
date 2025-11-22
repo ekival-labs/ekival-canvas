@@ -11,10 +11,10 @@ import (
 	"ekival-canvas/plutusEncoder"
 	"ekival-canvas/utility"
 
-	"github.com/rs/zerolog/log"
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	"github.com/rs/zerolog/log"
 )
 
 // cfg := config.GetGlobalConfig()
@@ -289,7 +289,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.Wallet) (string, s
 				Quantity: int(1),
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 600).
 		Complete()
@@ -309,7 +309,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.Wallet) (string, s
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

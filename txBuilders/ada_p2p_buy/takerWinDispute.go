@@ -330,7 +330,7 @@ func TakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 		).
 		PayToAddress(order.OrderInfo.TakerAddress, int(payToTakerAmount)).
 		PayToAddress(order.OrderInfo.MakerAddress, int(payToMakerAmount)).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.TakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		SetValidityStart(int64(lastSlot)).
@@ -351,7 +351,7 @@ func TakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

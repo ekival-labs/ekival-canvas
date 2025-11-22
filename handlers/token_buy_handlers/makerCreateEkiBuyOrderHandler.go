@@ -88,8 +88,16 @@ func MakerCreateEkiBuyOrderHandler(c *fiber.Ctx) error {
 	var md int64 = currentTime + (u.MakerDeadline * 1000)
 	var td int64 = currentTime + (u.TakerDeadline * 1000)
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	orderInfo := &model.Order{
 		OrderInfo: model.OrderInfo{

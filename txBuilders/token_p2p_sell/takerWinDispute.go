@@ -195,7 +195,7 @@ func TakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 				Name:     order.OrderInfo.TradeTokenName,
 				Quantity: int(payToTakerAmount),
 			}).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.TakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		SetValidityStart(int64(lastSlot)).
@@ -206,7 +206,7 @@ func TakerWinDispute(order *model.Order, treasury *model.TreasuryInfo, disputeRe
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Println(err)
 		return "", "", err

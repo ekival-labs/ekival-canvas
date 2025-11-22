@@ -166,7 +166,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string,
 				Quantity: int(totalAmount),
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.TakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -176,7 +176,7 @@ func TakerCommitToOrder(order *model.Order, adminWallet *config.Wallet) (string,
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Println(err)
 		return "", "", err

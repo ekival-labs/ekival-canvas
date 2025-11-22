@@ -10,10 +10,10 @@ import (
 	"ekival-canvas/model"
 	"ekival-canvas/utility"
 
-	"github.com/rs/zerolog/log"
 	"github.com/Salvionied/apollo"
 	"github.com/Salvionied/apollo/serialization"
 	"github.com/Salvionied/apollo/txBuilding/Utils"
+	"github.com/rs/zerolog/log"
 )
 
 // cfg := config.GetGlobalConfig()
@@ -88,7 +88,7 @@ func MakerCancelUncommittedOrder(order *model.Order, adminWallet *config.Wallet)
 		Str("function", "MakerCancelUncommittedOrder").
 		Str("order_id", order.OrderInfo.OrderId).
 		Interface("order", order).
-		Interface("admin_pkh", adminWallet.AdminPKH).
+		Interface("admin_pkh", adminWallet.PKH).
 		Msg("Order details and admin wallet info")
 
 	log.Debug().
@@ -254,7 +254,7 @@ func MakerCancelUncommittedOrder(order *model.Order, adminWallet *config.Wallet)
 			order.OrderTxInfo.EscrowContractRefUtxo.TxIDIndex,
 		).
 		PayToAddress(order.OrderInfo.MakerAddress, int(makerCommittedAmount)).
-		AddRequiredSigner(serialization.PubKeyHash(adminWallet.AdminPKH)).
+		AddRequiredSigner(serialization.PubKeyHash(adminWallet.PKH)).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -274,7 +274,7 @@ func MakerCancelUncommittedOrder(order *model.Order, adminWallet *config.Wallet)
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

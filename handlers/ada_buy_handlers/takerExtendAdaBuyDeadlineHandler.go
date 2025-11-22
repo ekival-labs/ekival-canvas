@@ -90,8 +90,16 @@ func TakerExtendAdaBuyDeadlineHandler(c *fiber.Ctx) error {
 		Datum:   utility.CreateSimpleDatum(constants.INDEX_ONE, constants.ADA_P2P_BUY_FEE_TYPE),
 	}
 
-	makerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.MakerPct, u.MakerMinFee)
-	collateralAmount := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.CollateralPct, u.MinCollateral)
+	makerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MakerMinFee, u.MakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	collateralAmount, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.MinCollateral, u.CollateralPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 
 	orderInfo := &model.Order{
 		OrderInfo: model.OrderInfo{
@@ -145,7 +153,11 @@ func TakerExtendAdaBuyDeadlineHandler(c *fiber.Ctx) error {
 	var extendPenalty int64 = 0
 
 	// Include taker fee as most deadline extensions happen on committed / active trades.
-	takerFee := utility.CalculateFee(u.Precision, u.OrderAmount, u.OrderThreshold, u.TakerPct, u.TakerMinFee)
+	takerFee, err := utility.CalculateFee(u.Precision, u.OrderThreshold, u.MinOrderAmount, u.TakerMinFee, u.TakerPct, u.OrderAmount)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
 	orderInfo.OrderTxInfo.TakerFee = takerFee
 
 	cborString, txHash, err := ada_p2p_buy.TakerExtendDeadline(orderInfo, treasuryInfo, extendPenalty, config.GetAdaP2PBuyAdminWallet())

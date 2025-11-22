@@ -291,7 +291,7 @@ func MakerCancelCommittedOrder(order *model.Order, treasury *model.TreasuryInfo,
 		).
 		PayToAddress(order.OrderInfo.MakerAddress, int(payToMakerAmount)).
 		PayToAddress(order.OrderInfo.TakerAddress, int(payToTakerAmount)).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		SetValidityStart(int64(lastSlot)).
@@ -312,7 +312,7 @@ func MakerCancelCommittedOrder(order *model.Order, treasury *model.TreasuryInfo,
 		Str("order_id", order.OrderInfo.OrderId).
 		Msg("Transaction built successfully, signing with admin wallet")
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Error().
 			Err(err).

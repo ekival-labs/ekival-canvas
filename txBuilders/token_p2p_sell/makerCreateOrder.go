@@ -167,7 +167,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.Wallet) (string, s
 				Quantity: int(makerCommittingAmount),
 			},
 		).
-		AddRequiredSigner(adminWallet.AdminPKH).
+		AddRequiredSigner(adminWallet.PKH).
 		AddRequiredSigner(serialization.PubKeyHash(order.OrderInfo.MakerAddress.PaymentPart)).
 		SetTtl(int64(lastSlot) + 300).
 		Complete()
@@ -177,7 +177,7 @@ func MakerCreateOrder(order *model.Order, adminWallet *config.Wallet) (string, s
 		return "", "", err
 	}
 
-	apolloBE, err = apolloBE.SignWithSkey(adminWallet.AdminVkey, adminWallet.AdminSkey)
+	apolloBE, err = apolloBE.SignWithSkey(adminWallet.Vkey, adminWallet.Skey)
 	if err != nil {
 		log.Println(err)
 		return "", "", err
